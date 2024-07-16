@@ -6,14 +6,12 @@ import {
   MenuList,
   MenuItem,
   IconButton,
-  InputGroup,
-  Input,
-  InputRightElement,
   Button,
   Icon,
+  Textarea,
 } from "@chakra-ui/react";
-import { BsPaperclip, BsSearch, BsX } from "react-icons/bs";
-import { IoSend } from "react-icons/io5";
+import { BsPaperclip } from "react-icons/bs";
+
 import { MdOutlineKeyboardVoice } from "react-icons/md";
 import { CiImageOn } from "react-icons/ci";
 import youtubeLogo from "@/../public/youtube.png";
@@ -70,7 +68,8 @@ const CustomInput = () => {
         </div>
       </div>
       <div className="search-input w-full ml-2">
-        <Input
+        <Textarea
+          rows={1}
           placeholder="Type message"
           border="none"
           _focus={{
@@ -78,6 +77,9 @@ const CustomInput = () => {
             outline: "none",
             boxShadow: "none",
           }}
+          dir="auto"
+          className="m-0 resize-none border-0 bg-transparent px-0 text-token-text-primary focus:ring-0 focus-visible:ring-0"
+          style={{ overflow: "hidden", maxHeight: "200px" }}
         />
       </div>
       <div className="submit mr-2">

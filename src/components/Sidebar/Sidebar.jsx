@@ -18,6 +18,7 @@ import logo from "@/../public/converseLogo.png";
 import Image from "next/image";
 import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
 import { CgEditBlackPoint } from "react-icons/cg";
+import Link from "next/link";
 
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,9 +34,9 @@ function Sidebar() {
   ];
 
   const dummyHistory = [
-    { text: "AI Chat Tool Ethics" },
-    { text: "Al Chat Tool Impact Writing" },
-    { text: "AI Chat Tool Ethics" },
+    { text: "AI Chat Tool Ethics", id: 1 },
+    { text: "Al Chat Tool Impact Writing", id: 2 },
+    { text: "AI Chat Tool Ethics", id: 3 },
   ];
 
   if (isDrawer) {
@@ -81,21 +82,28 @@ function Sidebar() {
         <div className="logo py-2">
           <Image src={logo} className="w-[180px]" />
         </div>
-        <Button fontWeight="normal" colorScheme="blue">
-          New Chat
-        </Button>
+        <Link
+          href={"/"}
+          fontWeight="normal"
+          className="px-5 py-2 bg-blue-600 rounded-lg flex justify-center items-center"
+        >
+          <p className="font-semibold text-white">New Chat</p>
+        </Link>
         <div className="history flex justify-between items-center bg-gray-100 px-5 py-3 rounded">
           <p className="font-semibold">History</p>
           <IoMdArrowDropdown />
         </div>
         <div className="chatHistory overflow-y-scroll no-scrollbar px-4 py-2">
           {dummyHistory?.map((val) => (
-            <p className="hisData flex items-center gap-2 pb-3">
+            <Link
+              href={`${val?.id}`}
+              className="hisData flex items-center gap-2 pb-3"
+            >
               <span>
                 <CgEditBlackPoint />
               </span>
               {val?.text}
-            </p>
+            </Link>
           ))}
         </div>
         <hr />
