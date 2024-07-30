@@ -48,8 +48,8 @@ const CustomInput = () => {
               maxWidth="120px"
               backgroundColor="#f7f9fb"
             >
-              {dropdownMenuIcons?.map((logo) => (
-                <MenuItem minWidth="full" backgroundColor="#f7f9fb">
+              {dropdownMenuIcons?.map((logo,index) => (
+                <MenuItem minWidth="full" backgroundColor="#f7f9fb" key={index}>
                   <div className="social p-2 bg-white shadow-md rounded-full">
                     <Image src={logo} className="w-6" />
                   </div>

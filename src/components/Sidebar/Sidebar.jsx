@@ -111,8 +111,9 @@ function Sidebar() {
           <IoMdArrowDropdown />
         </div>
         <div className="chatHistory overflow-y-scroll no-scrollbar px-4 py-2">
-          {dummyHistory?.map((val) => (
+          {dummyHistory?.map((val,index) => (
             <Link
+            key={index}
               href={`${val?.id}`}
               className="hisData flex items-center gap-2 pb-3"
             >
@@ -125,8 +126,8 @@ function Sidebar() {
         </div>
         <hr />
         <div className="bottom">
-          {bottomMenu?.map((item) => (
-            <div className="menu flex items-center gap-3 py-2 cursor-pointer" onClick={item?.onPress}>
+          {bottomMenu?.map((item,index) => (
+            <div className="menu flex items-center gap-3 py-2 cursor-pointer" onClick={item?.onPress} key={index}>
               <span className="icon">
                 <CgEditBlackPoint />
               </span>
