@@ -19,18 +19,35 @@ import Image from "next/image";
 import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
 import { CgEditBlackPoint } from "react-icons/cg";
 import Link from "next/link";
+import { Router } from "next/router";
+import useStore from "@/lib/zustand";
+import { shallow } from "zustand/shallow";
+import { useRouter } from 'next/navigation';  
 
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const btnRef = useState(null);
   const isDrawer = useBreakpointValue({ base: true, lg: false });
+  const router = useRouter();  
+
+  const { setUser } = useStore(
+    (state) => ({
+      setUser: state.setUser,
+    }),
+    shallow
+  )
 
   const bottomMenu = [
     { key: "clear-conversation", value: "Clear Conversation" },
     { key: "privacy-policy", value: "Privacy Policy" },
     { key: "my-account", value: "My Account" },
     { key: "update-faq", value: "Updates & FAQ" },
-    { key: "logout", value: "Logout" },
+    { key: "logout", value: "Logout"  ,
+      onPress:()=>{
+        setUser(null)
+        router.push('/')
+
+    }},
   ];
 
   const dummyHistory = [
@@ -109,7 +126,7 @@ function Sidebar() {
         <hr />
         <div className="bottom">
           {bottomMenu?.map((item) => (
-            <div className="menu flex items-center gap-3 py-2 cursor-pointer">
+            <div className="menu flex items-center gap-3 py-2 cursor-pointer" onClick={item?.onPress}>
               <span className="icon">
                 <CgEditBlackPoint />
               </span>
