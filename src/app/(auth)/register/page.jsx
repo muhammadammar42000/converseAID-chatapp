@@ -50,8 +50,7 @@ delete values.confirmPassword
         }
       })
       .catch((error) => {
-        const errorCode = error.code
-       
+        const errorCode = error.code       
         toast({
           position: 'top-right',
           status: 'error',
