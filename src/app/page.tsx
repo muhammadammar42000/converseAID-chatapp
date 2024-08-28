@@ -1,8 +1,8 @@
 "use client";
 import { Flex } from "@chakra-ui/react";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import DefaultHomeScreen from "@/components/DefaultHomeScreen/DefaultHomeScreen";
-// import MainScreen from "@/components/MainScreen/MainScreen";
+// import DefaultHomeScreen from "@/components/DefaultHomeScreen/DefaultHomeScreen";
+import MainScreen from "@/components/MainScreen/MainScreen";
 import LoginScreen from "@/app/(auth)/login/page";
 import useStore from "@/lib/zustand";
 import { shallow } from "zustand/shallow";
@@ -25,7 +25,7 @@ const Home = () => {
         {user ? (
           <>
             <Sidebar />
-            <DefaultHomeScreen />
+            <MainScreen  />
           </>
 
         ):

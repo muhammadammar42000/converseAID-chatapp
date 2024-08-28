@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import { ChakraProviderLocal } from "@/providers/chakraProvider";
 import { fonts } from "@/fonts/fonts";
-
+import ReactQueryProvider from "@/utils/ReactQueryProvider";
 export const metadata: Metadata = {
   title: "Trukkr | Tracking App",
   description: "Trukkr next gen tracking",
@@ -14,12 +13,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
-    <html lang="en" className={fonts.rubik.variable}>
+    <html lang="en" className={fonts.rubik.variable} suppressHydrationWarning>
       <body>
-        <ChakraProviderLocal>
-          <div>{children}</div>
-        </ChakraProviderLocal>
+        <ReactQueryProvider>
+          {children}     </ReactQueryProvider>
+
       </body>
     </html>
   );

@@ -11,43 +11,69 @@ import {
   DrawerContent,
   DrawerCloseButton,
   Button,
+  Spinner,
 } from "@chakra-ui/react";
 import { AiFillHome } from "react-icons/ai"; // Example icon
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logo from "@/../public/converseLogo.png";
 import Image from "next/image";
 import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
 import { CgEditBlackPoint } from "react-icons/cg";
 import Link from "next/link";
-import { Router } from "next/router";
 import useStore from "@/lib/zustand";
 import { shallow } from "zustand/shallow";
-import { useRouter } from 'next/navigation';  
+import { useRouter } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
+import { dataBase } from "@/firebase/firebase";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const btnRef = useState(null);
   const isDrawer = useBreakpointValue({ base: true, lg: false });
-  const router = useRouter();  
+  const [listMessage, setListMessages] = useState([]);
+  const router = useRouter();
 
-  const { setUser } = useStore(
+  const { setUser, user } = useStore(
     (state) => ({
       setUser: state.setUser,
+      user: state.user,
     }),
     shallow
-  )
+  );
+  const { data, isLoading } = useQuery({
+    queryKey: "messageHistory",
+    queryFn: getMessages,
+  });
+
+  async function getMessages() {
+    const docRef = doc(dataBase, "messagesIds", user?.userId);
+    const docSnap = await getDoc(docRef);
+    try {
+      if (docSnap.exists()) {
+        return docSnap.data();
+      } else {
+        return { data: [] };
+      }
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
 
   const bottomMenu = [
     { key: "clear-conversation", value: "Clear Conversation" },
     { key: "privacy-policy", value: "Privacy Policy" },
     { key: "my-account", value: "My Account" },
     { key: "update-faq", value: "Updates & FAQ" },
-    { key: "logout", value: "Logout"  ,
-      onPress:()=>{
-        setUser(null)
-        router.push('/')
-
-    }},
+    {
+      key: "logout",
+      value: "Logout",
+      onPress: () => {
+        setUser(null);
+        router.push("/");
+      },
+    },
   ];
 
   const dummyHistory = [
@@ -55,7 +81,6 @@ function Sidebar() {
     { text: "Al Chat Tool Impact Writing", id: 2 },
     { text: "AI Chat Tool Ethics", id: 3 },
   ];
-
   if (isDrawer) {
     return (
       <>
@@ -111,23 +136,36 @@ function Sidebar() {
           <IoMdArrowDropdown />
         </div>
         <div className="chatHistory overflow-y-scroll no-scrollbar px-4 py-2">
-          {dummyHistory?.map((val,index) => (
+          {isLoading && (
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="sm"
+            />
+          )}
+          {data?.userMessages?.map((val, index) => (
             <Link
-            key={index}
-              href={`${val?.id}`}
+              key={index}
+              href={`?search=${val?.thread_id}`}
               className="hisData flex items-center gap-2 pb-3"
             >
               <span>
                 <CgEditBlackPoint />
               </span>
-              {val?.text}
+              {val?.message}
             </Link>
           ))}
         </div>
         <hr />
         <div className="bottom">
-          {bottomMenu?.map((item,index) => (
-            <div className="menu flex items-center gap-3 py-2 cursor-pointer" onClick={item?.onPress} key={index}>
+          {bottomMenu?.map((item, index) => (
+            <div
+              className="menu flex items-center gap-3 py-2 cursor-pointer"
+              onClick={item?.onPress}
+              key={index}
+            >
               <span className="icon">
                 <CgEditBlackPoint />
               </span>

@@ -5,9 +5,14 @@ import Image from "next/image";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { GiFallingStar } from "react-icons/gi";
 import { GoAlert } from "react-icons/go";
+import { useEffect } from "react";
+// import SendMessage from "@/app/pages/api/chat";
 
 
 function DefaultHomeScreen() {
+
+ 
+
   return (
     <div className="w-full px-10">
       <div className="propmtArea overflow-y-scroll no-scrollbar py-10">
@@ -77,9 +82,9 @@ function DefaultHomeScreen() {
           </div>
         </div>
       </div>
-      <div className="inputPrompt mt-3 px-32">
-        <CustomInput />
-      </div>
+      {/* <div className="inputPrompt mt-3 px-32">
+        <CustomInput sendMessage={(text: String) => callFunction(text)} />
+      </div> */}
     </div>
   );
 }
