@@ -23,7 +23,14 @@ import Link from "next/link";
 import useStore from "@/lib/zustand";
 import { shallow } from "zustand/shallow";
 import { useRouter } from "next/navigation";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import { dataBase } from "@/firebase/firebase";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -42,22 +49,40 @@ function Sidebar() {
     shallow
   );
   const { data, isLoading } = useQuery({
-    queryKey: "messageHistory",
+    queryKey: "UserCoversationChatLogs",
     queryFn: getMessages,
   });
 
   async function getMessages() {
-    const docRef = doc(dataBase, "messagesIds", user?.userId);
-    const docSnap = await getDoc(docRef);
     try {
-      if (docSnap.exists()) {
-        return docSnap.data();
-      } else {
-        return { data: [] };
-      }
+      const q = query(
+        collection(dataBase, "messagesIds"),
+        where("userId", "==", user?.userId)
+      );
+
+      // Wrapping in a Promise to return the result after snapshot
+      const messages = await new Promise((resolve, reject) => {
+        const unsubscribe = onSnapshot(
+          q,
+          (querySnapshot) => {
+            const messageList = [];
+            querySnapshot.forEach((doc) => {
+              messageList.push(doc.data());
+            });
+            resolve(messageList);
+            unsubscribe(); // Stop listening after fetching data
+          },
+          (error) => {
+            console.log("Snapshot error: ", error);
+            reject(error);
+          }
+        );
+      });
+
+      return messages;
     } catch (error) {
-      console.log(error);
-      return error;
+      console.log("Error fetching messages: ", error);
+      return { data: [] };
     }
   }
 
@@ -100,7 +125,7 @@ function Sidebar() {
             <DrawerBody>
               <VStack spacing={4} align="stretch">
                 <div className="logo">
-                  <Image src={logo} className="w-[200px]" />
+                  <Image src={logo} className="w-[200px]" alt={"logo"} />
                 </div>
                 <IconButton aria-label="Home" icon={<AiFillHome />} />
                 <p>More options...</p>
@@ -122,11 +147,10 @@ function Sidebar() {
     >
       <VStack spacing={4} align="stretch">
         <div className="logo py-2">
-          <Image src={logo} className="w-[180px]" />
+          <Image src={logo} className="w-[180px]" alt="logo" />
         </div>
         <Link
-          href={"/"}
-          fontWeight="normal"
+          href={`/`}
           className="px-5 py-2 bg-blue-600 rounded-lg flex justify-center items-center"
         >
           <p className="font-semibold text-white">New Chat</p>
@@ -145,7 +169,7 @@ function Sidebar() {
               size="sm"
             />
           )}
-          {data?.userMessages?.map((val, index) => (
+          {data?.map((val, index) => (
             <Link
               key={index}
               href={`?search=${val?.thread_id}`}

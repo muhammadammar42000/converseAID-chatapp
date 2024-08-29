@@ -4,8 +4,8 @@ import "./globals.css";
 import { fonts } from "@/fonts/fonts";
 import ReactQueryProvider from "@/utils/ReactQueryProvider";
 export const metadata: Metadata = {
-  title: "Trukkr | Tracking App",
-  description: "Trukkr next gen tracking",
+  title: "ConverseAID",
+  description: "ConverseAID.Ai",
 };
 
 export default function RootLayout({

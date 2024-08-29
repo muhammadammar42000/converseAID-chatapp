@@ -107,10 +107,10 @@ delete values.confirmPassword
       {/* Left Column */}
       <div className="hidden md:flex flex-col bg-gradient-to-b from-white to-blue-700">
         <div className="logo ml-10 mt-10">
-          <Image src={logo} className="w-[300px]" />
+          <Image src={logo} className="w-[300px]" alt="logo" />
         </div>
         <div className="flex justify-center items-center h-full">
-          <Image src={CustomerSupport} className="max-w-full" />
+          <Image src={CustomerSupport} className="max-w-full"  alt="CustomerSupport"/>
         </div>
       </div>
       {/* Right Column */}

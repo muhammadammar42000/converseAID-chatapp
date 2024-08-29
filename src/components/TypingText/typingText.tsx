@@ -39,8 +39,8 @@ const TypingText = React.forwardRef((props: TypingTextProps, ref: any) => {
 
   useEffect(() => {
     if (ref.current) {
-      ref.current.addEventListener('scroll', handleScroll)
-      return () => ref.current.removeEventListener('scroll', handleScroll)
+      ref?.current?.addEventListener('scroll', handleScroll)
+      return () => ref?.current?.removeEventListener('scroll', handleScroll)
     }
   }, [ref])
   return <PrettifyHTML htmlString={currentText} />

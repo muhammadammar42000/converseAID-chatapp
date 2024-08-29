@@ -12,11 +12,9 @@ import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import useStore from "@/lib/zustand";
 import { shallow } from "zustand/shallow";
-import { Router } from "next/router";
 import { auth, dataBase, } from "@/firebase/firebase";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { useToast } from "@chakra-ui/react";
-import { DiFirebase } from "react-icons/di";
 
 const LoginPage = () => {
   const toast = useToast()
@@ -194,10 +192,10 @@ const LoginPage = () => {
       {/* Left Column */}
       <div className="hidden md:flex flex-col bg-gradient-to-b from-white to-blue-700">
         <div className="logo ml-10 mt-10">
-          <Image src={logo} className="w-[300px]" />
+          <Image src={logo} className="w-[300px]" alt="logo" />
         </div>
         <div className="flex justify-center items-center h-full">
-          <Image src={CustomerSupport} className="max-w-full" />
+          <Image src={CustomerSupport} className="max-w-full" alt="CustomerSupport" />
         </div>
       </div>
       {/* Right Column */}
@@ -294,7 +292,7 @@ const LoginPage = () => {
                 onClick={() => googleLogin()}
                 className="w-full flex items-center  border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:shadow-outline mb-2"
               >
-                <Image src={GoogleLogo} className="max-w-full w-[30px] mr-2" />
+                <Image src={GoogleLogo} className="max-w-full w-[30px] mr-2"  alt="GoogleLogo"/>
                 Continue with Google
               </button>
               <button
