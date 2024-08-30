@@ -3,6 +3,7 @@ import CustomInput from "@/components/CustomInput/CustomInput";
 import Image from "next/image";
 import logo from "@/../public/logo.png";
 import botImg from "@/../public/bot.png";
+import talkingChatBox from "@/../public/talkingChatBot.gif";
 import youtubeThumbnail from "@/../public/fifa-Screenshot.png";
 import { useEffect, useRef, useState } from "react";
 import DefaultHomeScreen from "../DefaultHomeScreen/DefaultHomeScreen";
@@ -18,8 +19,10 @@ function MainScreen() {
   const queryClient = useQueryClient();
   const [thread_id, setThreadId] = useState<string>('');
   const searchParams = useSearchParams();
+  const [isPlaying,setIsPlaying]=useState(false)
   const router = useRouter()
   const search: any = searchParams.get('search');
+
   const { mutateAsync, isPending, isSuccess } = useMutation({
     mutationFn: ({ data, handler, thread_id, user }: any) => {
       return callFunction(data, handler, thread_id, user)
@@ -85,6 +88,40 @@ function MainScreen() {
     }
   };
 
+
+
+  async function playSound(text: any) {
+    const audioPlayer: any = document.getElementById('audioPlayer')
+
+    try {
+
+      let response = await mutateAsync({
+        data: { text, thread_id, oldMessages: data.messages },
+        handler: 'handler-three',
+        thread_id: thread_id,
+        user: user,
+      })
+
+      const bufferData = response.data.audio.data; // Access the array part of the buffer object
+
+      // Convert the buffer data array into an ArrayBuffer
+      const arrayBuffer = new Uint8Array(bufferData).buffer;
+
+      // Create a Blob from the ArrayBuffer, assuming the audio type is 'audio/wav'
+      const blob = new Blob([arrayBuffer], { type: 'audio/wav' });
+
+      // Generate a URL from the Blob
+      const url = URL.createObjectURL(blob);
+
+      // Set the audio player's source to the blob URL and play
+      audioPlayer.src = url;
+      setIsPlaying(true)
+      audioPlayer.play();
+    }
+    catch (err) {
+      console.log('Error ====>', err)
+    }
+  }
   const { user } = useStore(
     (state: any) => ({
       setUser: state.setUser,
@@ -121,7 +158,6 @@ function MainScreen() {
       if (scrollView?.current) {
         scrollView.current.scrollTop = scrollView.current.scrollHeight
       }
-
       // Step 2: Call API Function
       let response = await mutateAsync({
         data: { prompt: text, thread_id, oldMessages: data.messages },
@@ -133,6 +169,7 @@ function MainScreen() {
 
       // Step 3: Update Local State with API Response
       if (isSuccess) {
+        playSound(response.data?.messages[response.data?.messages?.length - 1].content)
         if (response.data.messages.length === 2) {
           router?.push(
             `/?search=${thread_id}`,
@@ -154,13 +191,22 @@ function MainScreen() {
     }
   };
 
+  function stopVoice() {
+    const audioPlayer: any = document.getElementById('audioPlayer')
+    audioPlayer?.pause()
+    setIsPlaying(false)
+
+  }
   let hasData = data?.messages?.length
   return (
     <div className="w-full">
+      <audio id="audioPlayer" className="hidden" controls onEnded={() => stopVoice()}></audio>
+
       {hasData ? (
         <div>
           <div className="fixed top-0 w-full h-[200px] z-50 flex justify-center items-center">
-            <Image src={botImg} alt="Bot Image" width={150} height={150} />
+            <Image src={isPlaying?talkingChatBox:botImg} alt="Bot Image" width={150} height={150} />
+
           </div>
 
           <div ref={scrollView} className="propmtArea overflow-y-scroll no-scrollbar p-10">

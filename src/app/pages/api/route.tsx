@@ -1,9 +1,12 @@
 import OpenAI from "openai";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
-
+import fs from "fs";
+import path from "path";
 // Set up OpenAI configuration
-const openai = new OpenAI({
+const speechFile = path.resolve("./speech.mp3");
+
+const openAI = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_API_GPT as string, // Ensure API key is typed correctly
 });
 
@@ -19,6 +22,43 @@ type Data = {
   oldMessages?: Message[];
   prompt?: string;
 };
+
+export async function generateAudio(req: Request, res: NextApiResponse) {
+  const { text } = await req.json();
+  if (text) {
+    try {
+      let response: any = await openAI.audio.speech.create({
+        response_format: 'wav',
+        input: text,
+        model: 'tts-1',
+        voice: 'echo',
+      })
+      // Convert to Buffer to send to api and FrontEnd will covert that audio in wav file
+      const buffer = Buffer.from(await response.arrayBuffer());
+      return NextResponse.json({
+        data: {
+          audio: buffer,
+          response,
+          text: text,
+        }
+      })
+
+    } catch (error) {
+      console.log(error, 'ppppp');
+
+      return NextResponse.json(
+        { errorL: "Internal Error", error },
+        { status: 400 }
+      );
+    }
+  }
+  else {
+    return NextResponse.json(
+      { error: "Text is required to convert into audio" },
+      { status: 400 }
+    );
+  }
+}
 
 export async function postHandler(req: any, res: any) {
   // Manually parse the request body
@@ -38,15 +78,15 @@ export async function postHandler(req: any, res: any) {
   }
 
   try {
-    await openai.beta.threads.messages.create(thread_id, {
+    await openAI.beta.threads.messages.create(thread_id, {
       content: prompt,
       role: "user",
     });
     // Run Bot To Generate the Response in the Thread
-    await openai.beta.threads.runs.createAndPoll(thread_id, {
+    await openAI.beta.threads.runs.createAndPoll(thread_id, {
       assistant_id: process.env.NEXT_PUBLIC_API_ASSISTANT_ID ?? "",
     });
-    const messages: any = await openai.beta.threads.messages.list(thread_id, {
+    const messages: any = await openAI.beta.threads.messages.list(thread_id, {
       order: "asc",
     });
     return NextResponse.json(
@@ -86,7 +126,7 @@ export async function getHandler(req: Request, res: Response) {
   const thread_id = searchParams.get("thread_id");
   try {
     if (thread_id) {
-      const OldMessages: any = await openai.beta.threads.messages.list(
+      const OldMessages: any = await openAI.beta.threads.messages.list(
         thread_id,
         {
           order: "desc",
@@ -104,7 +144,7 @@ export async function getHandler(req: Request, res: Response) {
       });
 
       return NextResponse.json(
-        { data: {  messages } },
+        { data: { messages } },
         { status: 200, statusText: "Ok Hai Jna da" }
       );
     } else {
@@ -157,7 +197,7 @@ export async function deleteHandler(
 export async function postHandlerTwo(req: any, res: any) {
   // You can await here
   try {
-    const response = await openai.beta.threads.create();
+    const response = await openAI.beta.threads.create();
     return NextResponse.json(
       { data: { thread_id: response?.id } },
       { status: 200, statusText: "Created new Thread Id" }
@@ -172,12 +212,14 @@ export async function postHandlerTwo(req: any, res: any) {
 export default async function handler(req: Request, res: NextApiResponse) {
   const customHeader = await req.headers.get("x-custom-header"); // Ensure the header value is cast correctly
   switch (
-    customHeader // Use a custom header to differentiate
+  customHeader // Use a custom header to differentiate
   ) {
     case "handler-one":
       return postHandler(req, res);
     case "handler-two":
       return postHandlerTwo(req, res);
+    case "handler-three":
+      return generateAudio(req, res);
     default:
       return NextResponse.json(
         {},
