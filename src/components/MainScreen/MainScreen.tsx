@@ -19,7 +19,7 @@ function MainScreen() {
   const queryClient = useQueryClient();
   const [thread_id, setThreadId] = useState<string>('');
   const searchParams = useSearchParams();
-  const [isPlaying,setIsPlaying]=useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
   const router = useRouter()
   const search: any = searchParams.get('search');
 
@@ -204,8 +204,12 @@ function MainScreen() {
 
       {hasData ? (
         <div>
-          <div className="fixed top-0 w-full h-[200px] z-50 flex justify-center items-center">
-            <Image src={isPlaying?talkingChatBox:botImg} alt="Bot Image" width={150} height={150} />
+          <div className="fixed top-0 w-full h-[200px] z-50 flex justify-center items-center" style={{
+            background: "rgba(255, 255, 255, 0.1)",
+            backdropFilter: "blur(2px)",
+            WebkitBackdropFilter: "blur(2px)",
+          }}>
+            <Image src={isPlaying ? talkingChatBox : botImg} alt="Bot Image" width={150} height={150} />
 
           </div>
 
