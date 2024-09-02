@@ -21,11 +21,11 @@ import Image from "next/image";
 import { GoPaperAirplane } from "react-icons/go";
 
 type CustomInputProps = {
-  sendMessage: (text?: string) => void;
+  sendMessage?: (text: string) => void;
   loading?: boolean
 };
 
-const CustomInput: React.FC<CustomInputProps> = ({ sendMessage, loading }) => {
+const CustomInput: React.FC<CustomInputProps> = ({ sendMessage = () => { }, loading }) => {
   const inputRef = useRef<HTMLTextAreaElement | null>(null); // Ensure inputRef can be null
 
   const dropdownMenuIcons = [
@@ -94,8 +94,8 @@ const CustomInput: React.FC<CustomInputProps> = ({ sendMessage, loading }) => {
           className="m-0 resize-none border-0 bg-transparent px-0 text-token-text-primary focus:ring-0 focus-visible:ring-0"
           style={{ overflow: "hidden", maxHeight: "200px" }}
           ref={inputRef}
-          onKeyPress={(e)=> e.key === 'Enter' && !loading && handleSendMessage()}
-          // onKeyPress={(e) => e.key === 'Enter' && !loading && handleUserInput()}
+          onKeyPress={(e) => e.key === 'Enter' && !loading && handleSendMessage()}
+        // onKeyPress={(e) => e.key === 'Enter' && !loading && handleUserInput()}
 
         />
       </div>
