@@ -209,6 +209,35 @@ export async function postHandlerTwo(req: any, res: any) {
     );
   }
 }
+
+export async function voiceCovertIntoText(req: Request, res: any) {
+  const body = await req.json();
+  const { audioFile } = body
+  try {
+    // Send Voice to ChatGpt to convert to Text
+    const response = await openAI.audio.transcriptions.create({
+      file: audioFile,
+      model: 'whisper-1',
+    })
+    if (response?.text) {
+      NextResponse.json({
+        data: {
+          audio: audioFile,
+          response,
+          text: response.text,
+        }
+      }, { status: 200, statusText: 'Success' })
+      // Send Text to ChatGpt Assistant To Get The Response
+
+    }
+  } catch (error) {
+    NextResponse.json({
+      error,
+
+    }, { status: 404 })
+    // Getting Error To Console
+  }
+}
 export default async function handler(req: Request, res: NextApiResponse) {
   const customHeader = await req.headers.get("x-custom-header"); // Ensure the header value is cast correctly
   switch (
@@ -220,6 +249,9 @@ export default async function handler(req: Request, res: NextApiResponse) {
       return postHandlerTwo(req, res);
     case "handler-three":
       return generateAudio(req, res);
+    case "handler-four":
+      return voiceCovertIntoText(req, res);
+
     default:
       return NextResponse.json(
         {},
