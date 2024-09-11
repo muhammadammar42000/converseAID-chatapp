@@ -83,32 +83,23 @@ const CustomInput: React.FC<CustomInputProps> = ({ sendMessage = () => { }, load
         thread_id: thread_id,
         user: user,
       })
-      if (response?.text) {
-        console.log('Ok')
-        // Send Text to ChatGpt Assistant To Get The Response
-        // handleUserInput(null, response.text)
-        // setVoiceoading(false)
-        // } else setIs
-        // Loading(false)
+      console.log(response)
+      if (response) {
+        sendMessage(response?.transcription);
       }
     }
     catch (error) {
-      // Getting Error To Console
-      // setIsLoading(false)
       console.log(error, '==============>');
 
     }
   }
   function startRecord() {
-    console.log(recording, '-----Rec---------')
     if (!recording) {
       startRecording()
-
     }
     else {
       stopRecording()
     }
-
   }
 
   return (
@@ -151,6 +142,7 @@ const CustomInput: React.FC<CustomInputProps> = ({ sendMessage = () => { }, load
         <Textarea
           rows={1}
           placeholder="Type message"
+          disabled={recording}
           border="none"
           _focus={{
             border: "none",
@@ -167,12 +159,14 @@ const CustomInput: React.FC<CustomInputProps> = ({ sendMessage = () => { }, load
       </div>
 
 
-      <div className="submit mr-2">
-        <Button onClick={handleSendMessage} isLoading={loading}>
-          <Icon as={GoPaperAirplane} />
-        </Button>
-      </div>
-      <div className="voice-option" >
+      {!recording &&
+        <div className="submit mr-2">
+          <Button onClick={handleSendMessage} isLoading={loading} >
+            <Icon as={GoPaperAirplane} />
+          </Button>
+        </div>}
+
+      <div className={`${recording ? 'voice-option animate-pulse' : 'voice-option'}`}>
         <Button onClick={() => startRecord()} isLoading={loading}>
 
           <Icon boxSize={6} as={MdOutlineKeyboardVoice} />
