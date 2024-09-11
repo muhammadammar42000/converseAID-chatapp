@@ -9,7 +9,7 @@ interface UseRecordVoiceReturn {
 
 export const useRecordVoice = (
   SendVoiceResponse: any,
-  open: Boolean
+  open?: Boolean
 ): UseRecordVoiceReturn => {
   const { setNotify } = useStore(
     (state: any) => ({
@@ -77,6 +77,7 @@ export const useRecordVoice = (
           }
         })
         .catch((error) => {
+          console.log(error,'----------')
           setNotify({
             message: `Error accessing microphone:${error}`,
             type: "error",

@@ -19,6 +19,8 @@ function MainScreen() {
   const queryClient = useQueryClient();
   const [thread_id, setThreadId] = useState<string>('');
   const searchParams = useSearchParams();
+
+  const [count, setCount] = useState(0)
   // const [isPlaying, setIsPlaying] = useState(false)
   const router = useRouter()
   const [voiceLoading, setVoiceLoading] = useState<any>({
@@ -42,7 +44,11 @@ function MainScreen() {
   })
   const scrollView = useRef<HTMLDivElement>(null);
 
-  console.log(variables, '----')
+  useEffect(() => {
+
+
+  }, [])
+
 
   const { data, refetch } = useQuery({
     queryKey: ['messageHistory', search || thread_id],
@@ -174,7 +180,7 @@ function MainScreen() {
 
       // Step 3: Update Local State with API Response
       if (isSuccess) {
-        playSound(response.data?.messages[response.data?.messages?.length - 1].content, response.data?.messages.length)
+        playSound(response.data?.messages[response.data?.messages?.length - 1].content, response.data?.messages.length - 1)
         if (response.data.messages.length === 2) {
           router?.push(
             `/?search=${thread_id}`,
@@ -359,7 +365,10 @@ function MainScreen() {
 
 
       <div className="inputPrompt mt-3 px-32">
-        <CustomInput sendMessage={sendMessage} />
+
+        <CustomInput sendMessage={sendMessage}
+          thread_id={thread_id}
+          user={user} />
       </div>
     </div >
   );

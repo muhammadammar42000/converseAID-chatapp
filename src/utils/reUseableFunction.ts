@@ -5,7 +5,7 @@ const callFunction = async (
   ObjData?: Object | any,
   headerType?: string,
   thread_id?: string,
-  user?: any
+  user?: any,
 ) => {
   try {
     const response = await fetch("/pages/api", {
@@ -39,4 +39,4 @@ const callFunction = async (
   }
 };
 
-export  { callFunction,};
+export { callFunction };

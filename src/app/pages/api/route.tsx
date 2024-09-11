@@ -1,8 +1,10 @@
 import OpenAI from "openai";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
-import fs from "fs";
 import path from "path";
+
+import formidable, { errors as formidableErrors } from 'formidable';
+import fs from 'fs';
 // Set up OpenAI configuration
 const speechFile = path.resolve("./speech.mp3");
 
@@ -22,6 +24,16 @@ type Data = {
   oldMessages?: Message[];
   prompt?: string;
 };
+
+export const config = {
+  api: {
+    bodyParser: false,
+    externalResolver: true,
+  },
+}
+
+
+
 
 export async function generateAudio(req: Request, res: NextApiResponse) {
   const { text } = await req.json();
@@ -210,32 +222,69 @@ export async function postHandlerTwo(req: any, res: any) {
   }
 }
 
-export async function voiceCovertIntoText(req: Request, res: any) {
-  const body = await req.json();
-  const { audioFile } = body
+const base64ToAudioFile = (base64Audio: string, outputPath: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    // Remove metadata from base64 string (e.g., "data:audio/wav;base64,")
+    const base64Data = base64Audio.replace(/^data:audio\/\w+;base64,/, '');
+
+    // Convert the base64 string to binary buffer
+    const audioBuffer = Buffer.from(base64Data, 'base64');
+
+    // Write buffer to a file
+    fs.writeFile(outputPath, audioBuffer, (err) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(outputPath); // Return the file path if successful
+    });
+  });
+};
+
+export async function voiceCovertIntoText(req: Request, res: NextApiResponse) {
   try {
-    // Send Voice to ChatGpt to convert to Text
-    const response = await openAI.audio.transcriptions.create({
-      file: audioFile,
-      model: 'whisper-1',
-    })
-    if (response?.text) {
-      NextResponse.json({
-        data: {
-          audio: audioFile,
-          response,
-          text: response.text,
-        }
-      }, { status: 200, statusText: 'Success' })
-      // Send Text to ChatGpt Assistant To Get The Response
+    // Assume the body is sent as a JSON object with a base64-encoded audio file
+    const body = await req.json();
+    const { audioFile } = body;
 
+    if (!audioFile) {
+      throw new Error("Audio file (base64) is missing from the request body");
     }
-  } catch (error) {
-    NextResponse.json({
-      error,
 
-    }, { status: 404 })
-    // Getting Error To Console
+    const outputPath = path.join(process.cwd(), 'output-audio-file.wav'); // Save the file in a writable directory
+
+    // Convert the base64 string to an audio file
+    await base64ToAudioFile(audioFile, outputPath);
+
+    // Create a readable stream for the file
+    const fileStream = fs.createReadStream(outputPath);
+
+    // Send the file to OpenAI for transcription
+    const transcription = await openAI.audio.transcriptions.create({
+      file: fileStream, // Send the file stream
+      model: 'whisper-1',
+      response_format: 'text',
+    });
+
+    // Return the transcription result
+
+    fs.unlink(outputPath, (err) => {
+      if (err) {
+        console.error(`Error removing file: ${err}`);
+        return;
+      }
+
+      console.log(`File ${outputPath} has been successfully removed.`);
+    });
+    return NextResponse.json({
+      success: true,
+      transcription: transcription,
+    }, { status: 200 });
+  } catch (err: any) {
+    console.error('Error during transcription:', err);
+    return NextResponse.json({
+      success: false,
+      error: err.message || 'An error occurred',
+    }, { status: 500 });
   }
 }
 export default async function handler(req: Request, res: NextApiResponse) {
@@ -251,7 +300,6 @@ export default async function handler(req: Request, res: NextApiResponse) {
       return generateAudio(req, res);
     case "handler-four":
       return voiceCovertIntoText(req, res);
-
     default:
       return NextResponse.json(
         {},
@@ -266,3 +314,4 @@ export {
   putHandler as PUT,
   deleteHandler as DELETE,
 };
+
