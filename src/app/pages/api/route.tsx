@@ -2,8 +2,6 @@ import OpenAI from "openai";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import path from "path";
-
-import formidable, { errors as formidableErrors } from 'formidable';
 import fs from 'fs';
 // Set up OpenAI configuration
 const speechFile = path.resolve("./speech.mp3");
@@ -228,7 +226,7 @@ const base64ToAudioFile = (base64Audio: string, outputPath: string): Promise<str
     const base64Data = base64Audio.replace(/^data:audio\/\w+;base64,/, '');
 
     // Convert the base64 string to binary buffer
-    const audioBuffer = Buffer.from(base64Data, 'base64');
+    const audioBuffer: any = Buffer.from(base64Data, 'base64');
 
     // Write buffer to a file
     fs.writeFile(outputPath, audioBuffer, (err) => {
