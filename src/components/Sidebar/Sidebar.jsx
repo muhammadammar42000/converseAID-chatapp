@@ -35,8 +35,8 @@ import {
 import { dataBase } from "@/firebase/firebase";
 
 function Sidebar() {
-
   const [isOpen, setIsOpen] = useState(false);
+  const [messageHistoryLoading, setMessageHistoryLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const btnRef = useState(null);
   const router = useRouter();
@@ -55,6 +55,7 @@ function Sidebar() {
   );
   useEffect(() => {
     if (user?.userId) {
+      setMessageHistoryLoading(true);
       const q = query(
         collection(dataBase, "messagesIds"),
         where("userId", "==", user?.userId)
@@ -67,7 +68,7 @@ function Sidebar() {
         });
         setMessages(messageList); // Update the UI immediately
       });
-
+      setMessageHistoryLoading(false);
       // Clean up listener when component unmounts
       return () => unsubscribe();
     }
@@ -119,32 +120,7 @@ function Sidebar() {
       console.log(error);
     }
   }
-  // async function getMessages() {
-  //   const q = query(
-  //     collection(dataBase, "messagesIds"),
-  //     where("userId", "==", user?.userId)
-  //   );
-
-  //   return new Promise((resolve, reject) => {
-  //     const unsubscribe = onSnapshot(
-  //       q,
-  //       (querySnapshot) => {
-  //         const messageList = [];
-  //         querySnapshot.forEach((doc) => {
-  //           messageList.push(doc.data());
-  //         });
-  //         resolve(messageList);
-  //       },
-  //       (error) => {
-  //         console.log("Snapshot error: ", error);
-  //         reject(error);
-  //       }
-  //     );
-
-  //     // Optional: You can return unsubscribe if you want to manually unsubscribe later
-  //     return () => unsubscribe();
-  //   });
-  // }
+ 
   const bottomMenu = [
     {
       key: "clear-conversation",
@@ -220,15 +196,7 @@ function Sidebar() {
           <IoMdArrowDropdown />
         </div>
         <div className="chatHistory overflow-y-scroll no-scrollbar px-4 py-2">
-          {false && (
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="blue.500"
-              size="sm"
-            />
-          )}
+         
           {messages?.map((val, index) => (
             <Link
               key={index}
@@ -241,6 +209,15 @@ function Sidebar() {
               {val?.message}
             </Link>
           ))}
+           {messageHistoryLoading && (
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="sm"
+            />
+          )}
         </div>
         <hr />
         <div className="bottom">

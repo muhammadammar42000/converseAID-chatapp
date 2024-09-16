@@ -7,7 +7,7 @@ import CustomerSupport from "../../../../public/conserse.png";
 import GoogleLogo from "../../../../public/google.png";
 import MicrosoftLogo from "../../../../public/microsoft.png";
 import Link from "next/link";
-import { fetchSignInMethodsForEmail, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { fetchSignInMethodsForEmail, getAuth, GoogleAuthProvider, OAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import useStore from "@/lib/zustand";
@@ -85,6 +85,27 @@ const LoginPage = () => {
       })
   }
 
+  const microsoftLogin = async () => {
+    const auth = getAuth();
+    const provider = new OAuthProvider('microsoft.com');
+  
+    try {
+      const result = await signInWithPopup(auth, provider);
+      
+      // This gives you a Microsoft Access Token.
+      const credential = OAuthProvider.credentialFromResult(result);
+      const accessToken = credential.accessToken;
+      
+      // The signed-in user info.
+      const user = result.user;
+  
+      console.log('User Info:', user);
+      console.log('Access Token:', accessToken);
+    } catch (error) {
+      console.error('Error during Microsoft login:', error);
+    }
+  };
+  
 
   const initialValues = {
     email: null,
@@ -297,6 +318,8 @@ const LoginPage = () => {
               </button>
               <button
                 type="button"
+                onClick={() => microsoftLogin()}
+
                 className="w-full flex items-center border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:shadow-outline"
               >
                 <Image

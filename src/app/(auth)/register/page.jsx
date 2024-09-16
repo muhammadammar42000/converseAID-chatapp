@@ -16,6 +16,7 @@ import { useToast } from "@chakra-ui/react";
 
 const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
+  
   const router = useRouter();
   const toast = useToast();
 
