@@ -21,13 +21,14 @@ import useStore from "@/lib/zustand";
 import { shallow } from "zustand/shallow";
 import { auth, dataBase } from "@/firebase/firebase";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { useToast } from "@chakra-ui/react";
+import { Spinner, useToast } from "@chakra-ui/react";
 
 const LoginPage = () => {
   const toast = useToast();
 
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [microsoftLoading, setMicrosoftLoading] = useState(false);
 
   const { setUser, setNotify } = useStore(
     (state) => ({
@@ -93,27 +94,75 @@ const LoginPage = () => {
 
   const microsoftLogin = async () => {
     const auth = getAuth();
+    setMicrosoftLoading(true);
     const provider = new OAuthProvider("microsoft.com");
 
     try {
       const result = await signInWithPopup(auth, provider);
-
       // This gives you a Microsoft Access Token.
       const credential = OAuthProvider.credentialFromResult(result);
       const accessToken = credential.accessToken;
-
       // The signed-in user info.
       const user = result.user;
+      const usersRef = collection(dataBase, "users");
+      const q = query(usersRef, where("userId", "==", result?.user?.uid));
+      // Adjust "users" to your specific collection name
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        setMicrosoftLoading(false);
+        const userDataOne = querySnapshot.docs[0].data();
+        // Combine user auth data with Firestore data
+        const userData = {
+          uid: userDataOne?.userId,
+          email: userDataOne.email,
+          ...userDataOne,
+        };
+        setUser(userData); // Assuming you have a setUser function to set user state
+        toast({
+          position: "top-right",
+          status: "success",
+          title: "Login Successfully",
+          duration: 9000,
+          isClosable: true,
+        });
+      } else {
+        const userData = {
+          active: true,
+          accessToken: accessToken,
+          createAt: new Date(),
+          updatedAt: new Date(),
+          email: result?.user?.email,
+          name: result?.user?.displayName,
+          userId: result?.user?.uid,
+        };
+        try {
+          addDoc(collection(dataBase, "users"), userData).then(() => {
+            setMicrosoftLoading(false);
 
-      console.log("User Info:", user);
-      console.log("Access Token:", accessToken);
+            setUser(userData); // Assuming you have a setUser function to set user state'
+            toast({
+              position: "top-right",
+              status: "success",
+              title: "Login Successfully",
+              duration: 9000,
+              isClosable: true,
+            });
+          });
+        } catch (e) {
+          setLoading(false);
+          console.error("Error adding document: ", e);
+        }
+      }
+      // This gives you a Google Access Token. You can use it to access the Google API.
     } catch (error) {
+      setMicrosoftLoading(false);
+
       setNotify({
         open: true,
         type: "error",
         message: `Error during Microsoft login`,
       });
-     
+
       console.error("Error during Microsoft login:", error);
     }
   };
@@ -349,6 +398,15 @@ const LoginPage = () => {
                   alt="GoogleLogo"
                 />
                 Continue with Google
+                {googleLoading && (
+                  <Spinner
+                    thickness="4px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color="blue.500"
+                    size="sm"
+                  />
+                )}
               </button>
               <button
                 type="button"
@@ -360,6 +418,15 @@ const LoginPage = () => {
                   className="max-w-full w-[20px] mr-3"
                 />
                 Continue with Microsoft Account
+                {microsoftLoading && (
+                  <Spinner
+                    thickness="4px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color="blue.500"
+                    size="sm"
+                  />
+                )}
               </button>
             </div>
           </div>
