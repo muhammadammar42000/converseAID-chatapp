@@ -235,8 +235,8 @@ function MainScreen() {
 
           </div>
 
-          <div ref={scrollView} className="propmtArea overflow-y-scroll no-scrollbar p-10">
-            <div className="conversation">
+          <div ref={scrollView} className="p-10 mt-40">
+            <div className="propmtArea conversation overflow-y-scroll no-scrollbar" >
               {data?.messages?.map((item: any, index: number) => (
                 <div key={index}>
                   {item.role === "user" && (

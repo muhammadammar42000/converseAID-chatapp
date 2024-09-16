@@ -15,7 +15,7 @@ function DefaultHomeScreen() {
 
   return (
     <div className="w-full px-10">
-      <div className="propmtArea overflow-y-scroll no-scrollbar py-10">
+      <div className="promptAreaDefault overflow-y-scroll no-scrollbar py-10">
         <div className="defaultScreen flex justify-center items-center flex-col gap-4">
           <div className="logo">
             <Image src={"/conserse.png"} alt="logo" width={250} height={250} />

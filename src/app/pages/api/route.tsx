@@ -193,15 +193,45 @@ export async function putHandler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+
   res.status(405).json({ error: "Method not allowed" });
 }
 
 // DELETE handler (example)
 export async function deleteHandler(
-  req: NextApiRequest,
+  req: Request,
   res: NextApiResponse<Data>
 ) {
-  res.status(405).json({ error: "Method not allowed" });
+  // Manually parse the request body
+  const body = await req.json()
+  const { thread_id, }: { prompt: string; thread_id?: any; oldMessages?: Message[] } = body;
+  try {
+    if (thread_id) {
+      const response = await openAI.beta.threads.del(thread_id)
+      if (response)
+        return NextResponse.json({
+          data: [],
+          message: 'Thread Deleted Successfully'
+        }, {
+          status: 200,
+          statusText: 'Thread Deleted Successfully'
+        })
+    }
+    else {
+      NextResponse.json({
+        data: [],
+        message: 'Thread Id is Required'
+      }, {
+        status: 400,
+        statusText: 'Thread Id is Required'
+      })
+
+    }
+
+  }
+  catch (err) {
+
+  }
 }
 
 export async function postHandlerTwo(req: any, res: any) {
@@ -305,10 +335,12 @@ export default async function handler(req: Request, res: NextApiResponse) {
       );
   }
 }
+
 // Default export to delegate to named handlers
 export {
   handler as POST,
   getHandler as GET,
+
   putHandler as PUT,
   deleteHandler as DELETE,
 };

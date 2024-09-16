@@ -31,6 +31,7 @@ type CustomInputProps = {
 };
 
 const CustomInput: React.FC<CustomInputProps> = ({ sendMessage = () => { }, loading, thread_id, user }) => {
+
   const { mutateAsync, isPending, isSuccess, variables } = useMutation({
     mutationFn: ({ data, handler, thread_id, user }: any) => {
       return callFunction(data, handler, thread_id, user)

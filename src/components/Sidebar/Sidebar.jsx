@@ -22,25 +22,30 @@ import { CgEditBlackPoint } from "react-icons/cg";
 import Link from "next/link";
 import useStore from "@/lib/zustand";
 import { shallow } from "zustand/shallow";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   collection,
   doc,
-  getDoc,
   onSnapshot,
   query,
   where,
+  deleteDoc,
+  getDocs,
 } from "firebase/firestore";
 import { dataBase } from "@/firebase/firebase";
-import { useMutation, useQuery } from "@tanstack/react-query";
 
 function Sidebar() {
+
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const btnRef = useState(null);
-  const isDrawer = useBreakpointValue({ base: true, lg: false });
-  const [listMessage, setListMessages] = useState([]);
   const router = useRouter();
 
+  const isDrawer = useBreakpointValue({ base: true, lg: false });
+  const searchParams = useSearchParams();
+  const [messages, setMessages] = useState([]);
+
+  const search = searchParams.get("search");
   const { setUser, user } = useStore(
     (state) => ({
       setUser: state.setUser,
@@ -48,46 +53,106 @@ function Sidebar() {
     }),
     shallow
   );
-  const { data, isLoading } = useQuery({
-    queryKey: "UserCoversationChatLogs",
-    queryFn: getMessages,
-  });
-
-  async function getMessages() {
-    try {
+  useEffect(() => {
+    if (user?.userId) {
       const q = query(
         collection(dataBase, "messagesIds"),
         where("userId", "==", user?.userId)
       );
 
-      // Wrapping in a Promise to return the result after snapshot
-      const messages = await new Promise((resolve, reject) => {
-        const unsubscribe = onSnapshot(
-          q,
-          (querySnapshot) => {
-            const messageList = [];
-            querySnapshot.forEach((doc) => {
-              messageList.push(doc.data());
-            });
-            resolve(messageList);
-            unsubscribe(); // Stop listening after fetching data
-          },
-          (error) => {
-            console.log("Snapshot error: ", error);
-            reject(error);
-          }
-        );
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const messageList = [];
+        querySnapshot.forEach((doc) => {
+          messageList.push(doc.data());
+        });
+        setMessages(messageList); // Update the UI immediately
       });
 
-      return messages;
+      // Clean up listener when component unmounts
+      return () => unsubscribe();
+    }
+  }, [user?.userId]);
+
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ["UserCoversationChatLogs"],
+  //   queryFn: getMessages,
+  // });
+  async function deleteThread() {
+    setLoading(true);
+    try {
+      let ObjData = {
+        data: { text: null, thread_id: search, oldMessages: [] },
+        handler: "handler-three",
+        thread_id: search,
+        user: user,
+      };
+      const response = await fetch("/pages/api", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(ObjData),
+      });
+      if (response) {
+        // Query the collection where the unique field matches the value
+        const q = query(
+          collection(dataBase, "messagesIds"),
+          where("thread_id", "==", search)
+        );
+
+        // Execute the query
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          // Since the field is unique, we expect only one document
+          const documentSnapshot = querySnapshot.docs[0]; // Get the first and only document
+          const docRef = doc(dataBase, "messagesIds", documentSnapshot.id); // get document ID
+          await deleteDoc(docRef); // delete the document
+          router.push("/");
+          setLoading(false);
+        } else {
+          console.log("No document found with the given unique field value.");
+        }
+      }
     } catch (error) {
-      console.log("Error fetching messages: ", error);
-      return { data: [] };
+      setLoading(false);
+
+      console.log(error);
     }
   }
+  // async function getMessages() {
+  //   const q = query(
+  //     collection(dataBase, "messagesIds"),
+  //     where("userId", "==", user?.userId)
+  //   );
 
+  //   return new Promise((resolve, reject) => {
+  //     const unsubscribe = onSnapshot(
+  //       q,
+  //       (querySnapshot) => {
+  //         const messageList = [];
+  //         querySnapshot.forEach((doc) => {
+  //           messageList.push(doc.data());
+  //         });
+  //         resolve(messageList);
+  //       },
+  //       (error) => {
+  //         console.log("Snapshot error: ", error);
+  //         reject(error);
+  //       }
+  //     );
+
+  //     // Optional: You can return unsubscribe if you want to manually unsubscribe later
+  //     return () => unsubscribe();
+  //   });
+  // }
   const bottomMenu = [
-    { key: "clear-conversation", value: "Clear Conversation" },
+    {
+      key: "clear-conversation",
+      value: "Clear Conversation",
+      onPress: () => {
+        if (!loading) deleteThread();
+      },
+    },
     { key: "privacy-policy", value: "Privacy Policy" },
     { key: "my-account", value: "My Account" },
     { key: "update-faq", value: "Updates & FAQ" },
@@ -101,11 +166,6 @@ function Sidebar() {
     },
   ];
 
-  const dummyHistory = [
-    { text: "AI Chat Tool Ethics", id: 1 },
-    { text: "Al Chat Tool Impact Writing", id: 2 },
-    { text: "AI Chat Tool Ethics", id: 3 },
-  ];
   if (isDrawer) {
     return (
       <>
@@ -160,7 +220,7 @@ function Sidebar() {
           <IoMdArrowDropdown />
         </div>
         <div className="chatHistory overflow-y-scroll no-scrollbar px-4 py-2">
-          {isLoading && (
+          {false && (
             <Spinner
               thickness="4px"
               speed="0.65s"
@@ -169,7 +229,7 @@ function Sidebar() {
               size="sm"
             />
           )}
-          {data?.map((val, index) => (
+          {messages?.map((val, index) => (
             <Link
               key={index}
               href={`?search=${val?.thread_id}`}
@@ -186,7 +246,7 @@ function Sidebar() {
         <div className="bottom">
           {bottomMenu?.map((item, index) => (
             <div
-              className="menu flex items-center gap-3 py-2 cursor-pointer"
+              className="menu flex items-center gap-3 py-2 cursor-pointer row center"
               onClick={item?.onPress}
               key={index}
             >
@@ -194,6 +254,16 @@ function Sidebar() {
                 <CgEditBlackPoint />
               </span>
               {item?.value}
+
+              {item.value == "Clear Conversation" && loading && (
+                <Spinner
+                  thickness="4px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color="blue.500"
+                  size="sm"
+                />
+              )}
             </div>
           ))}
         </div>
