@@ -231,9 +231,9 @@ function MainScreen() {
             background: "rgba(255, 255, 255, 0.1)",
             backdropFilter: "blur(2px)",
             WebkitBackdropFilter: "blur(2px)",
-            marginTop: "calc(10vh - 20px)"
+            marginTop: "calc(10vh - 10px)"
           }}>
-            <Image src={voiceLoading?.isPlaying ? talkingChatBox : talkingWithoutChatBox} alt="Bot Image" width={300} height={300} />
+            <Image src={voiceLoading?.isPlaying ? talkingChatBox : talkingWithoutChatBox} alt="Bot Image" width={380} height={380} />
 
           </div>
 
