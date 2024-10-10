@@ -3,9 +3,10 @@ import CustomInput from "@/components/CustomInput/CustomInput";
 import Image from "next/image";
 import logo from "@/../public/logo.png";
 import botImg from "@/../public/bot.png";
-import talkingChatBox from "@/../public/talkingChatBot.gif";
 import youtubeThumbnail from "@/../public/fifa-Screenshot.png";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import talkingChatBox from "@/../public/talkingChatBot.gif";
+import talkingWithoutChatBox from "@/../public/without_talking_chat_bot.gif";
 import DefaultHomeScreen from "../DefaultHomeScreen/DefaultHomeScreen";
 import { useSearchParams } from "next/navigation";
 import TypingText from "../TypingText/typingText";
@@ -230,8 +231,9 @@ function MainScreen() {
             background: "rgba(255, 255, 255, 0.1)",
             backdropFilter: "blur(2px)",
             WebkitBackdropFilter: "blur(2px)",
+            marginTop: "calc(10vh - 20px)"
           }}>
-            <Image src={voiceLoading?.isPlaying ? talkingChatBox : botImg} alt="Bot Image" width={150} height={150} />
+            <Image src={voiceLoading?.isPlaying ? talkingChatBox : talkingWithoutChatBox} alt="Bot Image" width={300} height={300} />
 
           </div>
 

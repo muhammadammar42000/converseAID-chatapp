@@ -398,7 +398,7 @@ const LoginPage = () => {
                   alt="GoogleLogo"
                 />
                 Continue with Google
-                {/* terminal */}
+          
                 {googleLoading && (
                   <Spinner
                     thickness="4px"

@@ -41,7 +41,8 @@ export async function generateAudio(req: Request, res: NextApiResponse) {
         response_format: 'wav',
         input: text,
         model: 'tts-1',
-        voice: 'echo',
+        voice: 'shimmer',
+        
       })
       // Convert to Buffer to send to api and FrontEnd will covert that audio in wav file
       const buffer = Buffer.from(await response.arrayBuffer());
