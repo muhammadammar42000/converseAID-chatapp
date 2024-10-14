@@ -1,12 +1,10 @@
 "use client";
-import CustomInput from "@/components/CustomInput/CustomInput";
 import { Icon } from "@chakra-ui/react";
 import Image from "next/image";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { GiFallingStar } from "react-icons/gi";
+
 import { GoAlert } from "react-icons/go";
-import { useEffect } from "react";
-// import SendMessage from "@/app/pages/api/chat";
 
 
 function DefaultHomeScreen() {
@@ -30,13 +28,14 @@ function DefaultHomeScreen() {
               </div>
               <div className="start-message gap-3 flex flex-col mt-3">
                 <p className="p-2 bg-gray-100 rounded-full text-sm inline-block">
-                  "Explain quantum computing insimple terms"
+                  Explain quantum computing insimple terms
+                </p>
+                <p className="p-2 bg-gray-100 rounded-full
+                 text-sm inline-block">
+                  Got any creative ideas for a 10year old s birthday?
                 </p>
                 <p className="p-2 bg-gray-100 rounded-full text-sm inline-block">
-                  "Got any creative ideas for a 10year old's birthday?"
-                </p>
-                <p className="p-2 bg-gray-100 rounded-full text-sm inline-block">
-                  "How do I make an HTTP requestin Javascript?"
+                How do I make an HTTP requestin Javascript?
                 </p>
               </div>
             </div>
@@ -49,13 +48,13 @@ function DefaultHomeScreen() {
               </div>
               <div className="start-message gap-3 flex flex-col mt-3">
                 <p className="p-2 bg-gray-100 rounded-full text-sm inline-block">
-                  "Remembers what user saidearlier in the conversation."
+                  Remembers what user saidearlier in the conversation.
                 </p>
                 <p className="p-2 bg-gray-100 rounded-full text-sm inline-block">
-                  "Allows user to provide follow-up corrections."
+                  Allows user to provide follow-up corrections.
                 </p>
                 <p className="p-2 bg-gray-100 rounded-full text-sm inline-block">
-                  "Trained to decline inappropriate requests."
+                  Trained to decline inappropriate requests.
                 </p>
               </div>
             </div>
@@ -68,14 +67,14 @@ function DefaultHomeScreen() {
               </div>
               <div className="start-message gap-3 flex flex-col mt-3">
                 <p className="p-2 bg-gray-100 rounded-full text-sm inline-block">
-                  "May occasionally generate incorrect information."
+                  May occasionally generate incorrect information.
                 </p>
                 <p className="p-2 bg-gray-100 rounded-full text-sm inline-block">
-                  "May occasionally produce harmful instructions or biased
-                  content."
+                  May occasionally produce harmful instructions or biased
+                  content.
                 </p>
                 <p className="p-2 bg-gray-100 rounded-full text-sm inline-block">
-                  "Limited knowledge of world andevents after 2021."
+                  Limited knowledge of world andevents after 2021.
                 </p>
               </div>
             </div>

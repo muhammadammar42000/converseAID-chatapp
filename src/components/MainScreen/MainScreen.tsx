@@ -4,7 +4,7 @@ import Image from "next/image";
 import logo from "@/../public/logo.png";
 import botImg from "@/../public/bot.png";
 import youtubeThumbnail from "@/../public/fifa-Screenshot.png";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import talkingChatBox from "@/../public/talkingChatBot.gif";
 import talkingWithoutChatBox from "@/../public/without_talking_chat_bot.gif";
 import DefaultHomeScreen from "../DefaultHomeScreen/DefaultHomeScreen";
@@ -203,11 +203,6 @@ function MainScreen() {
     }
   };
 
-
-  const sendVoice = (audioFile: AudioBuffer) => {
-
-
-  }
   function stopVoice() {
     const audioPlayer: any = document.getElementById('audioPlayer')
     audioPlayer?.pause()

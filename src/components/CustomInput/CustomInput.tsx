@@ -76,7 +76,7 @@ const CustomInput: React.FC<CustomInputProps> = ({ sendMessage = () => { }, load
 
 
       // // Send Voice to ChatGpt to convert to Text
-      const response = await mutateAsync({
+      const response:any = await mutateAsync({
         data: {
           audioFile: value
         },
@@ -84,7 +84,6 @@ const CustomInput: React.FC<CustomInputProps> = ({ sendMessage = () => { }, load
         thread_id: thread_id,
         user: user,
       })
-      console.log(response)
       if (response) {
         sendMessage(response?.transcription);
       }

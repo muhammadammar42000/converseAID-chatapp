@@ -8,7 +8,7 @@ const callFunction = async (
   user?: any,
 ) => {
   try {
-    const response = await fetch("/pages/api", {
+    const response = await fetch("/api/route", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
