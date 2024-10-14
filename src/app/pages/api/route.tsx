@@ -22,14 +22,12 @@ type Data = {
   oldMessages?: Message[];
   prompt?: string;
 };
+export const runtime = 'edge';
 
-export const config = {
-  api: {
-    bodyParser: false,
-    externalResolver: true,
-  },
-}
-
+export const api = {
+  bodyParser: false,
+  externalResolver: true,
+};
 
 
 
