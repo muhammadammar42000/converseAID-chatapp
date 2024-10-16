@@ -59,7 +59,7 @@ a {
 .loader {
   width: 60px;
   aspect-ratio: 1;
-  color: #ffa516;
+  color: blue;
   background: linear-gradient(currentColor 0 0) 100% 0,
     linear-gradient(currentColor 0 0) 0 100%;
   background-size: 50.1% 50.1%;
